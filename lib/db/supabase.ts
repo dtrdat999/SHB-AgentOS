@@ -50,9 +50,9 @@ export function createBrowserClient() {
 // Singleton server client for API routes
 // Reused across requests to avoid creating new clients per request
 // ============================================================
-let _serverClient: ReturnType<typeof createClient> | null = null;
+let _serverClient: ReturnType<typeof createServerClient> | null = null;
 
-export function getServerClient() {
+export function getServerClient(): ReturnType<typeof createServerClient> {
   if (!_serverClient) {
     _serverClient = createServerClient();
   }

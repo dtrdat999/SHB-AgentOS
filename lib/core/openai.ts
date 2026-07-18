@@ -111,11 +111,13 @@ export async function runAgentConversation(options: AgentConversationOptions) {
     messages.push(choice.message);
 
     for (const toolCall of choice.message.tool_calls) {
-      const args = JSON.parse(toolCall.function.arguments);
-      const result = await options.toolExecutor(toolCall.function.name, args);
+      if (toolCall.type !== 'function') continue;
+      const fn = toolCall.function;
+      const args = JSON.parse(fn.arguments);
+      const result = await options.toolExecutor(fn.name, args);
 
       toolCallLog.push({
-        tool_name: toolCall.function.name,
+        tool_name: fn.name,
         arguments: args,
         result,
       });
