@@ -57,7 +57,7 @@ export default function BenchmarkPage() {
             </div>
             <div className="flex justify-between items-end border-b border-slate-200 pb-2">
               <span className="text-sm text-slate-600">Thời gian (Human Review)</span>
-              <span className="font-bold text-red-500">> 45s</span>
+              <span className="font-bold text-red-500">&gt; 45s</span>
             </div>
             <div className="flex justify-between items-end pb-1">
               <span className="text-sm text-slate-600">Rủi ro (Hallucination)</span>
