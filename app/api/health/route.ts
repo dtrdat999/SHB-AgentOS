@@ -16,6 +16,7 @@ export async function GET() {
   // Check Supabase connection
   try {
     const supabase = getServerClient();
+    if (!supabase) throw new Error("Supabase client is null");
     const { error } = await supabase.from('customers').select('id').limit(1);
     checks.database = error ? `error: ${error.message}` : 'ok';
   } catch (e) {
