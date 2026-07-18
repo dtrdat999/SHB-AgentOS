@@ -1,22 +1,18 @@
 {
-  "functions": {
-    "app/api/applications/route.ts": {
-      "maxDuration": 60
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
     },
-    "app/api/applications/[id]/route.ts": {
-      "maxDuration": 60
-    },
-    "app/api/applications/[id]/trace/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/approvals/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/approvals/[id]/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/rag/ingest/route.ts": {
-      "maxDuration": 60
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    }
+  ]
 }

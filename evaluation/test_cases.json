@@ -1,0 +1,117 @@
+[
+  {
+    "id": "case-1",
+    "name": "Case 1: Auto-approve (small, clean)",
+    "customer_id": "11111111-1111-1111-1111-111111111101",
+    "customer_name": "Nguyễn Văn An",
+    "amount_requested": 100000000,
+    "loan_term_months": 12,
+    "purpose": "Mua laptop và thiết bị làm việc",
+    "expected_outcome": {
+      "credit_decision": "approve",
+      "compliance_agent_called": false,
+      "final_status": "auto_approved",
+      "reasoning": "DTI thấp, credit score tốt, khoản vay nhỏ → Planner chỉ gọi Credit Agent → auto-approve"
+    },
+    "tests": ["dynamic_planning_skip_compliance", "auto_execute"]
+  },
+  {
+    "id": "case-2",
+    "name": "Case 2: Auto-approve (clean, employed)",
+    "customer_id": "11111111-1111-1111-1111-111111111102",
+    "customer_name": "Trần Thị Bình",
+    "amount_requested": 150000000,
+    "loan_term_months": 24,
+    "purpose": "Sửa chữa nhà ở",
+    "expected_outcome": {
+      "credit_decision": "approve",
+      "compliance_agent_called": false,
+      "final_status": "auto_approved",
+      "reasoning": "DTI an toàn, lịch sử sạch, credit score tốt → auto-approve"
+    },
+    "tests": ["happy_path"]
+  },
+  {
+    "id": "case-3",
+    "name": "Case 3: DTI borderline",
+    "customer_id": "11111111-1111-1111-1111-111111111103",
+    "customer_name": "Lê Hoàng Cường",
+    "amount_requested": 300000000,
+    "loan_term_months": 24,
+    "purpose": "Mở rộng cửa hàng kinh doanh",
+    "expected_outcome": {
+      "credit_decision": "flagged",
+      "compliance_agent_called": true,
+      "final_status": "pending_manager",
+      "reasoning": "DTI ~50%, self-employed, credit score 650 → cần Compliance review → confidence thấp → Manager queue"
+    },
+    "tests": ["agent_reasoning_depth", "borderline_dti"]
+  },
+  {
+    "id": "case-4",
+    "name": "Case 4: AML watchlist (Compliance VETO)",
+    "customer_id": "11111111-1111-1111-1111-111111111104",
+    "customer_name": "Phạm Đức Dũng",
+    "amount_requested": 500000000,
+    "loan_term_months": 36,
+    "purpose": "Đầu tư bất động sản",
+    "expected_outcome": {
+      "credit_decision": "approve",
+      "compliance_decision": "reject",
+      "compliance_agent_called": true,
+      "final_status": "pending_manager",
+      "reasoning": "Credit Agent approve (DTI tốt, credit score cao) NHƯNG Compliance Agent VETO (AML watchlist) → xung đột → Manager queue. Đây là WOW MOMENT."
+    },
+    "tests": ["agent_conflict_resolution", "compliance_veto", "aml_detection"]
+  },
+  {
+    "id": "case-5",
+    "name": "Case 5: Amount > 2B (Guardrail force HITL)",
+    "customer_id": "11111111-1111-1111-1111-111111111105",
+    "customer_name": "Hoàng Minh Tuấn",
+    "amount_requested": 2500000000,
+    "loan_term_months": 60,
+    "purpose": "Mua căn hộ cao cấp",
+    "expected_outcome": {
+      "credit_decision": "approve",
+      "compliance_agent_called": true,
+      "guardrail_flags": ["amount_exceeds_2b_threshold"],
+      "final_status": "pending_manager",
+      "reasoning": "Cả Credit và Compliance đều approve, NHƯNG guardrail rule bắt buộc force HITL vì amount > 2B. Chứng minh guardrail hoạt động INDEPENDENT với agent reasoning."
+    },
+    "tests": ["guardrail_determinism", "force_hitl"]
+  },
+  {
+    "id": "case-6",
+    "name": "Case 6: Previously rejected (Memory)",
+    "customer_id": "11111111-1111-1111-1111-111111111106",
+    "customer_name": "Võ Thanh Hải",
+    "amount_requested": 100000000,
+    "loan_term_months": 12,
+    "purpose": "Vốn kinh doanh freelance",
+    "expected_outcome": {
+      "credit_decision": "flagged",
+      "compliance_agent_called": true,
+      "guardrail_flags": ["customer_previously_rejected"],
+      "final_status": "pending_manager",
+      "reasoning": "Planner phát hiện lịch sử bị reject (memory) → nâng mức thận trọng → gọi cả Compliance → cannot_auto_approve → Manager queue"
+    },
+    "tests": ["memory_awareness", "history_check"]
+  },
+  {
+    "id": "case-7",
+    "name": "Case 7: DTI exact threshold (Edge case)",
+    "customer_id": "11111111-1111-1111-1111-111111111107",
+    "customer_name": "Đặng Thị Mai",
+    "amount_requested": 200000000,
+    "loan_term_months": 24,
+    "purpose": "Du học ngắn hạn và sinh hoạt",
+    "expected_outcome": {
+      "credit_decision": "approve",
+      "compliance_agent_called": false,
+      "final_status": "auto_approved",
+      "reasoning": "DTI = (6M + 200M/24) / 40M = (6M + 8.33M) / 40M = 35.8% → dưới ngưỡng 40% → approve. Agent phải TÍNH và SO SÁNH, không đoán."
+    },
+    "tests": ["edge_case_handling", "exact_threshold"]
+  }
+]
