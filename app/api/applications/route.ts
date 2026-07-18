@@ -1,22 +1,16 @@
-// ============================================================
-// SHB-AgentOS: Applications API
-// POST /api/applications — Submit new loan
-// GET /api/applications — List all
-// ============================================================
-// TODO: Implement in Milestone 4
-
+// GET /api/applications — List all loan applications
 import { NextResponse } from 'next/server';
+import { getServerClient } from '@/lib/db/supabase';
 
 export async function GET() {
-  return NextResponse.json({
-    message: 'Applications endpoint — not yet implemented',
-    milestone: 'M4',
-  }, { status: 501 });
-}
-
-export async function POST() {
-  return NextResponse.json({
-    message: 'Submit application endpoint — not yet implemented',
-    milestone: 'M4',
-  }, { status: 501 });
+  try {
+    const supabase = getServerClient();
+    const result = await supabase
+      .from("loan_applications")
+      .select("*, customers(full_name)")
+      .order("submitted_at", { ascending: false });
+    return NextResponse.json({ success: true, data: result.data || [] });
+  } catch (e) {
+    return NextResponse.json({ success: false, error: String(e) }, { status: 500 });
+  }
 }
